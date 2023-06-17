@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body {
+    @apply w-full h-full
+  }
+  
+  button {
+    @apply rounded bg-transparent dark:hover:bg-white/[0.15] hover:bg-black/[0.15] transition duration-300 p-2 flex items-center gap-x-1
+  }
+  input, textarea {
+    @apply rounded bg-transparent border dark:border-white/50 dark:placeholder:text-white/50 px-3 py-2 min-w-[450px]
+  }
+}
+
+@layer components {
+  .title {
+    @apply text-5xl
+  }
+}

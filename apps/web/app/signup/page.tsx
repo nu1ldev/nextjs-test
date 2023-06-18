@@ -30,7 +30,7 @@ const page = async () => {
             type='text'
             id='email'
             placeholder='Email'
-            onChange={e => setEmail(e.target.value)}
+            onChange={(() => (e) => setEmail(e.target.value))()}
           />
           <input
             className='dark:outline-none'

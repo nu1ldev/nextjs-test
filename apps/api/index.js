@@ -19,7 +19,7 @@ app.post('/users/create-user', async (req, res) => {
       username
     }
   });
-  res.send({ message: `Created user "${user.username}"`, user });
+  res.send({ message: `Created user '${user.username}'`, user });
 });
 
 app.post('/posts/create-post', async (req, res) => {

@@ -1,8 +1,13 @@
 'use client'
+
 import './globals.css'
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline'
 import React, { useState } from 'react'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
+import { SessionProvider, useSession } from 'next-auth/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import Navbar from '@/components/Navbar'
 
 export const metadata = {
   title: 'Create Next App',
@@ -23,49 +28,31 @@ export default function RootLayout({
       className={`w-full h-full`}
       data-theme={darkTheme ? 'dark' : 'light'}
     >
-      <QueryClientProvider client={queryClient}>
-        <body
-          className={`w-full h-full dark:bg-black dark:text-white bg-white text-black`}
-        >
-          <nav className='w-full h-16 flex items-center justify-around sticky top-0 left-0 dark:bg-black/70 border-b-[0.3px] dark:border-b-white/90 bg-white/70 border-b-black/90'>
-            <a href='/'>Home</a>
-            <a href='/placeholder'>Navbar Placeholder Link</a>
-            <div className='flex items-center gap-x-10'>
-              <a href='/posts/create-post'>Create Post</a>
-              <div className='h-12 w-px dark:bg-white/50 bg-black' />
-              <button onClick={() => setDarkTheme(prev => !prev)}>
-                {!darkTheme ? (
-                  <MoonIcon
-                    width={18}
-                    height={18}
-                  />
-                ) : (
-                  <SunIcon
-                    width={18}
-                    height={18}
-                  />
-                )}
-              </button>
+      <SessionProvider>
+        <QueryClientProvider client={queryClient}>
+          <body
+            className={`w-full h-full dark:bg-black dark:text-white bg-white text-black`}
+          >
+            <Navbar darkThemeProvider={darkTheme} setter={() => setDarkTheme(prev => !prev)} />
+            <div className='flex mt-20'>
+              <div
+                id='first'
+                className='w-20'
+              ></div>
+              <div
+                id='second'
+                className='grow'
+              >
+                {children}
+              </div>
+              <div
+                id='third'
+                className='w-20'
+              ></div>
             </div>
-          </nav>
-          <div className='flex mt-20'>
-            <div
-              id='first'
-              className='w-20'
-            ></div>
-            <div
-              id='second'
-              className='grow'
-            >
-              {children}
-            </div>
-            <div
-              id='third'
-              className='w-20'
-            ></div>
-          </div>
-        </body>
-      </QueryClientProvider>
+          </body>
+        </QueryClientProvider>
+      </SessionProvider>
     </html>
   )
 }

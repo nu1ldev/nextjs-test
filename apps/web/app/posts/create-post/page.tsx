@@ -1,74 +1,82 @@
 'use client'
 
-import React, { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import slug from 'slug'
+import React, { useRef } from 'react'
+import { useSession } from 'next-auth/react'
+import { redirect } from 'next/navigation'
 
 const page = () => {
-  const [title, setTitle] = useState<string>('')
-  const [content, setContent] = useState<string>('')
-  const [tags, setTags] = useState<Array<string>>([])
+  const titleRef = useRef<any>(null)
+  const contentRef = useRef<any>(null)
+  const tagsRef = useRef<any>(null)
+  const { data } = useSession({
+    required: true,
+    onUnauthenticated() {
+      redirect('/signin?callbackUrl=/posts/create-post')
+    },
+  })
   return (
-    <div>
-      <h1 className='text-5xl'>Create Post</h1>
-      <br />
-      <div
-        id='inputs'
-        className='flex flex-col gap-y-3'
-      >
-        <div>Create your own post by filling up every field below.</div>
-        <div
-          id='info'
-          className='flex flex-col gap-y-7'
-        >
-          <input
-            className='dark:outline-none w-min'
-            type='text'
-            id='title'
-            placeholder='Title'
-            onChange={e => setTitle(e.target.value)}
-          />
-          <textarea
-            placeholder='Content'
-            className='dark:outline-none w-min'
-            name='content'
-            id='content'
-            cols={30}
-            rows={10}
-            onChange={e => setContent(e.target.value)}
-          ></textarea>
-          <input
-            className='dark:outline-none w-min'
-            type='text'
-            id='tags'
-            placeholder='Tags'
-            onChange={e => setTags(e.target.value.split(' '))}
-          />
+    <>
+        <div>
+          <h1 className='text-5xl'>Create Post</h1>
+          <br />
+          <div
+            id='inputs'
+            className='flex flex-col gap-y-3'
+          >
+            <div>Create your own post by filling up every field below.</div>
+            <div
+              id='info'
+              className='flex flex-col gap-y-7'
+            >
+              <input
+                className='dark:outline-none w-min'
+                ref={titleRef}
+                type='text'
+                id='title'
+                placeholder='Title'
+              />
+              <textarea
+                placeholder='Content'
+                className='dark:outline-none w-min'
+                ref={contentRef}
+                name='content'
+                id='content'
+                cols={30}
+                rows={10}
+              ></textarea>
+              <input
+                className='dark:outline-none w-min'
+                ref={tagsRef}
+                type='text'
+                id='tags'
+                placeholder='Tags, e.g. tag1, tag2'
+              />
+            </div>
+            <button
+              onClick={async () => {
+                await fetch('http://localhost:3001/posts/create-post', {
+                  method: 'POST',
+                  mode: 'cors',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Accept: '*/*'
+                  },
+                  body: JSON.stringify({
+                    currentUser: data?.user,
+                    title: titleRef.current.value,
+                    content: contentRef.current.value,
+                    tags: tagsRef.current.value.split(', ')
+                  })
+                })
+              }}
+              className='w-min'
+            >
+              Submit
+            </button>
+            {JSON.stringify(data)}
+          </div>
         </div>
-        <button
-          onClick={async () => {
-            const currentUser = localStorage.getItem('currentUser')
-            await fetch('http://localhost:3001/posts/create-post', {
-              method: 'POST',
-              mode: 'cors',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': '*/*'
-              },
-              body: JSON.stringify({
-                title,
-                content,
-                tags,
-                currentUser
-              })
-            })
-          }}
-          className='w-min'
-        >
-          Submit
-        </button>
-      </div>
-    </div>
+    </>
   )
 }
 

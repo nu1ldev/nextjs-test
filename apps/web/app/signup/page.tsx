@@ -1,12 +1,11 @@
 'use client'
 
-import React, { useRef } from 'react'
-import Image from 'next/image'
-import discordIcon from '@/public/discord.svg'
-import twitterIcon from '@/public/twitter.svg'
-import { signIn, signOut } from 'next-auth/react'
+import { CurrentUserContext, useContext } from '@/user'
+import { redirect } from 'next/navigation'
+import React, { useRef, useState } from 'react'
 
-const page = async () => {
+const Page = async () => {
+  const context = useContext(CurrentUserContext)
   const emailRef = useRef<any>(null)
   const usernameRef = useRef<any>(null)
   const passwordRef = useRef<any>(null)
@@ -54,7 +53,7 @@ const page = async () => {
           </div>
           <button
             onClick={async () => {
-              const response = await fetch('http://localhost:3001/users/create-user', {
+              const response = await fetch('http://localhost:9000/users/new', {
                 method: 'POST',
                 mode: 'cors',
                 headers: {
@@ -68,26 +67,13 @@ const page = async () => {
                   password: passwordRef.current.value
                 })
               })
-              signIn('credentials')
+              const data = await response.json()
+              context.setCurrentUser(data.newUser)
+              redirect('/dashboard')
             }}
             className='w-min'
           >
             Submit
-          </button>
-        </div>
-        <div className='flex justify-evenly items-center text-white/60'>
-          <div className='h-px w-[45rem] bg-white/60'></div>
-          or
-          <div className='h-px w-[45rem] bg-white/60'></div>
-        </div>
-        <div id='providers' className='flex flex-col gap-y-3'>
-          <button onClick={() => signIn('discord')} className='bg-indigo-500 text-white hover:text-white hover:bg-indigo-600 flex items-center justify-center gap-x-3'>
-            <Image width={25} height={25} src={discordIcon} alt='' />
-            <p>Sign Up with Discord</p>
-          </button>
-          <button onClick={() => signIn('twitter')} className='bg-sky-500 text-white hover:text-white hover:bg-sky-600 flex items-center justify-center gap-x-3'>
-            <Image width={25} height={25} src={twitterIcon} alt='' />
-            <p>Sign Up with Twitter</p>
           </button>
         </div>
       </div>
@@ -95,4 +81,4 @@ const page = async () => {
   )
 }
 
-export default page
+export default Page

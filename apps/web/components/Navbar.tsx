@@ -1,18 +1,30 @@
+'use client'
+
 import { MoonIcon, SunIcon } from '@heroicons/react/24/outline'
-import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import Image from 'next/image'
 
-const Navbar = ({ darkThemeProvider, setter }: {
-  darkThemeProvider: boolean,
+const Navbar = ({
+  darkThemeProvider,
+  setter
+}: {
+  darkThemeProvider: boolean
   setter: () => void
 }) => {
-  const { data } = useSession()
   const [menu, setMenu] = useState<boolean>(false)
-  const menuItems = [
+  const menuItems: Array<{ href: string; name: string }> = [
     {
-      href: '/users/'
+      href: '/dashboard',
+      name: 'Dashboard'
+    },
+    {
+      href: '/dashboard/posts',
+      name: 'My posts'
+    },
+    {
+      href: '/settings',
+      name: 'Settings'
     }
   ]
   return (
@@ -35,19 +47,21 @@ const Navbar = ({ darkThemeProvider, setter }: {
             />
           )}
         </button>
-        <button onClick={() => setMenu(prev => !prev)} className='rounded-full p-0 block'>
-          {data?.user ? (
-            <>
-              {/* @ts-ignore */}
-              <Image className='object-cover rounded-full' src={data!.user!.image} alt='' width={30} height={30}  />
-            </>
-          ) : (
-            <Link href='/signin'>Sign In</Link>
-          )}
+        <button onClick={() => setMenu(prev => !prev)}>
+          
         </button>
         {menu && (
-          <div className='dark:border-gray-800 dark:bg-black bg-white border-gray-200 px-4 py-3 '>
-
+          <div className='border rounded dark:border-white/30 dark:bg-black bg-white border-gray-200 px-4 py-3 absolute flex flex-col gap-y-3 translate-x-56 translate-y-[5.5rem]'>
+            {menuItems.map(item => {
+              return (
+                <Link
+                  href={item.href}
+                  className='dark:hover:bg-white/30 transition rounded py-1 px-2 hover:bg-black/30'
+                >
+                  {item.name}
+                </Link>
+              )
+            })}
           </div>
         )}
       </div>

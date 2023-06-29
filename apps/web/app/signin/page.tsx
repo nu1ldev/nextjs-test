@@ -1,13 +1,18 @@
 'use client'
 
-import React, { useRef } from 'react'
-import useLocalStorage from 'use-local-storage'
-import { User } from '@prisma/client'
-import { ProviderButton } from '@/components'
+import React, { useEffect, useRef, useState } from 'react'
+import { CurrentUserContext, useContext } from '@/user'
+import { redirect } from 'next/navigation'
 
-const page = () => {
+const Page = () => {
+  const context = useContext(CurrentUserContext)
   const emailRef = useRef<any>(null)
   const passwordRef = useRef<any>(null)
+  const [test, setTest] = useState<boolean>(false)
+  let jsonData = {}
+  useEffect(() => {
+    context.setCurrentUser(jsonData)
+  }, [test])
   return (
     <div>
       <h1 className='title'>Sign In</h1>
@@ -25,14 +30,14 @@ const page = () => {
               ref={emailRef}
             />
             <input
-              type='text'
+              type='password'
               className='dark:outline-none'
               placeholder='Password'
               ref={passwordRef}
             />
           </div>
           <button onClick={async () => {
-            const response = await fetch('http://localhost:3001/signin', {
+            const response = await fetch('http://localhost:9000/users/get', {
               method: 'POST',
               mode: 'cors',
               headers: {
@@ -44,21 +49,17 @@ const page = () => {
                 password: passwordRef.current.value
               })
             })
+            const data = await response.json()
+            jsonData = data
+            setTest(!test)
+            redirect('/dashboard')
           }}>
             Submit
           </button>
-        </div>
-        <div className='flex justify-evenly items-center text-white/60'>
-          <div className='h-px w-[45rem] bg-white/60'></div>
-          or
-          <div className='h-px w-[45rem] bg-white/60'></div>
-        </div>
-        <div>
-          <ProviderButton provider='discord' />
         </div>
       </div>
     </div>
   )
 }
 
-export default page
+export default Page

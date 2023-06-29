@@ -1,15 +1,23 @@
 'use client'
 
-import { useQuery } from "@tanstack/react-query"
+import { useEffect, useState } from "react"
 
-export default function Page({ params }: { params: { postName: string } }) {
-  const { data, isLoading } = useQuery({
-    queryFn: async () => {
-      const data = await fetch(`http://localhost:3001/posts/${params.postName}`)
-      return await data.json()
-    }
-  })
-  console.log(data)
+export default function Page({ params }: { params: { slug: string } }) {
+  const [isLoading, setIsLoading] = useState<any>(true)
+  const [fetchState, setFetchState] = useState<any>(null)
+  useEffect(() => {
+    fetch(`http://localhost:9000/posts/${params.slug}`, {
+      mode: 'cors',
+      method: 'GET',
+      headers: {
+        "Content-Type": 'application-json',
+        "Accept": '*/*'
+      }
+    }).then(res => {
+      setFetchState(res)
+      setIsLoading(false)
+    })
+  }, [])
   return (
     <main>
       {isLoading ? (
@@ -28,11 +36,17 @@ export default function Page({ params }: { params: { postName: string } }) {
         </div>
       ) : (
         <div>
-          <h1 className='text-5xl'>{data.post.title}</h1>
-          <p>{data.post.author.username} &middot; {data.post.createdAt}</p>
-          <br />
           <div>
-            {data.post.content}
+            <h1 className='title'>{fetchState.title}</h1>
+            <div className='flex gap-x-2'>
+              <span>{fetchState.author}</span>
+              <span>&middot;</span>
+              <span>{fetchState.createdAt}</span>
+            </div>
+          </div>
+          <div className={`w-${window.innerWidth - (window.innerWidth / 6)} h-2 dark:bg-white/60 bg-black/60`} />
+          <div className='flex-wrap w-[25rem]'>
+            {fetchState.content}
           </div>
         </div>
       )}
